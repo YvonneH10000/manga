@@ -17,11 +17,15 @@
     --muted: #9a8f85;
   }
 
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
   body {
     background: var(--bg);
     color: var(--ink);
     font-family: 'Noto Serif SC', serif;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,10 +34,11 @@
   header {
     width: 100%;
     max-width: 480px;
-    padding: 2rem 1.5rem 1rem;
+    padding: 1rem 1.5rem 0.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-shrink: 0;
   }
 
   .back-btn {
@@ -55,8 +60,8 @@
   .back-btn:hover { background: var(--soft); }
 
   .title-block { flex: 1; }
-  .title-block h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
-  .title-block p { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .title-block h1 { font-size: 1rem; font-weight: 600; letter-spacing: 0.05em; }
+  .title-block p { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
 
   .page-counter {
     font-size: 0.8rem;
@@ -67,12 +72,15 @@
   .reader {
     width: 100%;
     max-width: 480px;
-    padding: 0 1rem;
     flex: 1;
+    position: relative;
+    padding: 0 1rem;
+    min-height: 0;
   }
 
   .comic-viewport {
     width: 100%;
+    height: 100%;
     overflow: hidden;
     border-radius: 8px;
     background: white;
@@ -82,12 +90,14 @@
 
   .comic-track {
     display: flex;
+    height: 100%;
     transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
     will-change: transform;
   }
 
   .comic-slide {
     min-width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,39 +105,47 @@
 
   .comic-slide img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
     display: block;
   }
 
-  .nav-area {
-    width: 100%;
-    max-width: 480px;
-    padding: 1.2rem 1rem 2rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .nav-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
-    background: transparent;
+  /* 左右悬浮按钮 */
+  .side-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 64px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
     color: var(--ink);
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s, opacity 0.15s, transform 0.15s;
+    z-index: 10;
+  }
+  .side-btn:hover { background: white; transform: translateY(-50%) scale(1.05); }
+  .side-btn:disabled { opacity: 0.15; cursor: not-allowed; }
+  .side-btn:disabled:hover { transform: translateY(-50%) scale(1); }
+  .side-btn.left { left: -4px; }
+  .side-btn.right { right: -4px; }
+
+  /* 进度条 */
+  .progress-wrap {
+    width: 100%;
+    max-width: 480px;
+    padding: 0.6rem 1rem 0.4rem;
     flex-shrink: 0;
   }
-  .nav-btn:hover { background: var(--soft); }
-  .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
-
   .progress-bar {
-    flex: 1;
+    width: 100%;
     height: 2px;
     background: var(--soft);
     border-radius: 2px;
@@ -147,7 +165,8 @@
     justify-content: center;
     width: 100%;
     max-width: 480px;
-    padding: 0 1rem 1.5rem;
+    padding: 0.3rem 1rem 0.8rem;
+    flex-shrink: 0;
   }
   .dot {
     width: 6px;
@@ -164,14 +183,13 @@
     transform: scale(1.3);
   }
 
-  /* 触摸滑动支持 */
   .comic-viewport { touch-action: pan-y; }
 </style>
 </head>
 <body>
 
 <header>
- <a class="back-btn" onclick="window.top.location.href='https://yvonneh10000.framer.website/yiwanwan'">←</a>
+  <a class="back-btn" onclick="window.top.location.href='https://yvonneh10000.framer.website/yiwanwan'">←</a>
   <div class="title-block">
     <h1>漫画连载</h1>
     <p>壹碗碗 · 个人作品</p>
@@ -181,27 +199,21 @@
 
 <div class="reader">
   <div class="comic-viewport" id="viewport">
-    <div class="comic-track" id="track">
-      <!-- 图片会由JS生成 -->
-    </div>
+    <div class="comic-track" id="track"></div>
   </div>
+  <button class="side-btn left" id="prevBtn" disabled>‹</button>
+  <button class="side-btn right" id="nextBtn">›</button>
 </div>
 
-<div class="nav-area">
-  <button class="nav-btn" id="prevBtn" disabled>←</button>
+<div class="progress-wrap">
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill" style="width:3.33%"></div>
   </div>
-  <button class="nav-btn" id="nextBtn">→</button>
 </div>
 
 <div class="dot-nav" id="dotNav"></div>
 
 <script>
-  // =============================================
-  // 把下面的图片路径换成你的实际图片路径
-  // 如果图片和 HTML 在同一个文件夹，直接写文件名就行
-  // =============================================
   const images = [
     '1.jpeg','2.jpeg','3.jpeg','4.jpeg','5.jpeg',
     '6.jpeg','7.jpeg','8.jpeg','9.jpeg','10.jpeg',
@@ -219,7 +231,6 @@
   const nextBtn = document.getElementById('nextBtn');
   let current = 0;
 
-  // 生成幻灯片
   images.forEach((src, i) => {
     const slide = document.createElement('div');
     slide.className = 'comic-slide';
@@ -253,13 +264,11 @@
   prevBtn.addEventListener('click', () => goTo(current - 1));
   nextBtn.addEventListener('click', () => goTo(current + 1));
 
-  // 键盘支持
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') goTo(current + 1);
     if (e.key === 'ArrowLeft') goTo(current - 1);
   });
 
-  // 触摸滑动
   let touchStartX = 0;
   const vp = document.getElementById('viewport');
   vp.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive: true});
