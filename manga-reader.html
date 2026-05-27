@@ -17,6 +17,8 @@
   .title-block h1 { font-size: 0.9rem; font-weight: 600; }
   .title-block p { font-size: 0.65rem; color: var(--muted); }
   .page-counter { font-size: 0.75rem; color: var(--muted); }
+  .close-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--ink); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink); flex-shrink: 0; transition: background 0.2s; }
+  .close-btn:hover { background: var(--soft); }
   .reader { width: 100%; max-width: 480px; flex: 1; position: relative; padding: 0 0.5rem; min-height: 0; }
   .comic-viewport { width: 100%; height: 100%; overflow: hidden; border-radius: 6px; background: white; box-shadow: 0 2px 16px rgba(0,0,0,0.08); touch-action: pan-y; cursor: zoom-in; }
   .comic-track { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1); will-change: transform; }
@@ -30,53 +32,20 @@
   .progress-wrap { width: 100%; max-width: 480px; padding: 0.4rem 1rem 0.6rem; flex-shrink: 0; }
   .progress-bar { width: 100%; height: 2px; background: var(--soft); border-radius: 2px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
-
-  .lightbox {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.6);
-    z-index: 9999;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.25s ease;
-    cursor: zoom-out;
-  }
+  .lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; overflow-y: auto; -webkit-overflow-scrolling: touch; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; cursor: zoom-out; }
   .lightbox.open { opacity: 1; pointer-events: all; }
-  .lightbox-inner {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 1rem 0;
-    cursor: zoom-out;
-  }
-  .lightbox-inner img {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    display: block;
-    border-radius: 4px;
-    cursor: zoom-out;
-  }
-  .lb-hint {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.2);
-    color: white; font-size: 11px;
-    padding: 4px 14px; border-radius: 12px;
-    pointer-events: none; white-space: nowrap;
-    z-index: 10000;
-  }
+  .lightbox-inner { width: 100%; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 1rem 0; cursor: zoom-out; }
+  .lightbox-inner img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 4px; cursor: zoom-out; }
+  .lb-hint { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); color: white; font-size: 11px; padding: 4px 14px; border-radius: 12px; pointer-events: none; white-space: nowrap; z-index: 10000; }
 </style>
 </head>
 <body>
 
 <header>
-  <a class="back-btn" onclick="window.top.location.href='https://yvonneh10000.framer.website/yiwanwan'">←</a>
+  <a class="back-btn" onclick="if(window.top!==window){window.top.postMessage('closeOverlay','*')}else{window.location.href='https://yvonneh10000.framer.website/yiwanwan'}">←</a>
   <div class="title-block"><h1>漫画连载</h1><p>壹碗碗 · 个人作品</p></div>
   <span class="page-counter" id="counter">1 / 30</span>
+  <button class="close-btn" onclick="if(window.top!==window){window.top.postMessage('closeOverlay','*')}else{history.back()}">✕</button>
 </header>
 
 <div class="reader">
@@ -111,23 +80,18 @@
     const slide = document.createElement('div');
     slide.className = 'comic-slide';
     const img = document.createElement('img');
-    img.src = src;
-    img.alt = `第${i+1}话`;
+    img.src = src; img.alt = `第${i+1}话`;
     img.loading = i < 3 ? 'eager' : 'lazy';
     slide.appendChild(img);
     slide.addEventListener('click', () => {
       const lb = document.createElement('img');
-      lb.src = src;
-      lb.alt = `第${i+1}话`;
-      lbInner.innerHTML = '';
-      lbInner.appendChild(lb);
-      lightbox.scrollTop = 0;
-      lightbox.classList.add('open');
+      lb.src = src; lb.alt = `第${i+1}话`;
+      lbInner.innerHTML = ''; lbInner.appendChild(lb);
+      lightbox.scrollTop = 0; lightbox.classList.add('open');
     });
     track.appendChild(slide);
   });
 
-  // 点任何地方都关闭
   lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
 
   function goTo(idx) {
@@ -147,6 +111,7 @@
     if (lightbox.classList.contains('open')) { lightbox.classList.remove('open'); return; }
     if (e.key === 'ArrowRight') goTo(current + 1);
     if (e.key === 'ArrowLeft') goTo(current - 1);
+    if (e.key === 'Escape') { if(window.top!==window){ window.top.postMessage('closeOverlay','*'); } }
   });
 
   let touchStartX = 0;
