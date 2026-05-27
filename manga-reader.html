@@ -31,12 +31,43 @@
   .progress-bar { width: 100%; height: 2px; background: var(--soft); border-radius: 2px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
 
-  /* 全屏 lightbox */
-  .lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; cursor: zoom-out; }
+  /* 全屏 lightbox — 可上下滚动 */
+  .lightbox {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    cursor: zoom-out;
+  }
   .lightbox.open { opacity: 1; pointer-events: all; }
-  .lightbox-inner { width: 90vw; max-width: 480px; max-height: 90vh; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-  .lightbox-inner img { width: 100%; height: auto; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-  .lb-hint { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); color: white; font-size: 11px; padding: 4px 14px; border-radius: 12px; pointer-events: none; white-space: nowrap; }
+  .lightbox-inner {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+  .lightbox-inner img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+  }
+  .lb-hint {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.2);
+    color: white; font-size: 11px;
+    padding: 4px 14px; border-radius: 12px;
+    pointer-events: none; white-space: nowrap;
+    z-index: 10000;
+  }
 </style>
 </head>
 <body>
@@ -89,12 +120,17 @@
       lb.alt = `第${i+1}话`;
       lbInner.innerHTML = '';
       lbInner.appendChild(lb);
+      lightbox.scrollTop = 0;
       lightbox.classList.add('open');
     });
     track.appendChild(slide);
   });
 
-  lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', e => {
+    if (e.target === lightbox || e.target === lbInner) {
+      lightbox.classList.remove('open');
+    }
+  });
 
   function goTo(idx) {
     if (idx < 0 || idx >= images.length) return;
@@ -110,6 +146,10 @@
   nextBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
 
   document.addEventListener('keydown', e => {
+    if (lightbox.classList.contains('open')) {
+      if (e.key === 'Escape') lightbox.classList.remove('open');
+      return;
+    }
     if (e.key === 'ArrowRight') goTo(current + 1);
     if (e.key === 'ArrowLeft') goTo(current - 1);
   });
