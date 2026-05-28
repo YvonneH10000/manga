@@ -9,7 +9,7 @@
   html, body { background: #fff; font-family: -apple-system, 'PingFang SC', sans-serif; }
   .wrap { max-width: 390px; margin: 0 auto; }
   .banner { width: 100%; height: 208px; overflow: hidden; display: block; }
-  .banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .banner img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
   .info-row { padding: 16px 16px 16px; display: flex; align-items: center; justify-content: space-between; }
   .info h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
   .info p { font-size: 13px; color: #999; }
@@ -21,19 +21,16 @@
   .toast-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 100; }
   .toast-wrap.show { display: flex; }
   .toast { background: white; border-radius: 12px; padding: 28px 24px; text-align: center; max-width: 280px; margin: 0 16px; }
-  .toast-icon { font-size: 40px; margin-bottom: 12px; }
-  .toast h2 { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+  .toast img { width: 200px; height: 200px; object-fit: contain; display: block; margin: 0 auto 12px; }
   .toast p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 20px; text-align: center; }
   .toast-close { background: #07c160; color: white; border: none; border-radius: 20px; padding: 8px 28px; font-size: 14px; cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="banner">
     <img src="banner.png" alt="壹碗碗">
   </div>
-
   <div class="info-row">
     <div class="info">
       <h1>壹碗碗</h1>
@@ -41,17 +38,14 @@
     </div>
     <button class="buy-btn" id="buyBtn">下载表情包</button>
   </div>
-
   <div class="grid" id="grid"></div>
-
 </div>
 
 <div class="toast-wrap" id="toastWrap">
   <div class="toast">
-    <div class="toast-icon">📱</div>
-    <h2>请用手机微信打开</h2>
-    <p>此链接仅支持在微信中跳转，请将页面分享到微信后打开</p>
-    <button class="toast-close" onclick="document.getElementById('toastWrap').classList.remove('show')">知道了</button>
+    <img src="sticker1.png" alt="二维码">
+    <p id="toastText"></p>
+    <button class="toast-close" onclick="document.getElementById('toastWrap').classList.remove('show')">关闭</button>
   </div>
 </div>
 
@@ -91,7 +85,8 @@ stickers.forEach(n => {
 
 document.addEventListener('click', () => shrink(active));
 
-document.getElementById('buyBtn').addEventListener('click', () => {
+document.getElementById('buyBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
   const isMobile = /Android|iPhone|iPod/i.test(navigator.userAgent);
   const toastText = document.getElementById('toastText');
   if (isMobile) {
