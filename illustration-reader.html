@@ -8,9 +8,11 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --bg: #1a1a1a; --ink: #f5f2ee; --soft: #333; --accent: #c85a3a; --muted: #888; }
-  html, body { height: 100%; overflow: hidden; }
+  /* 改动②：加了 100dvh，手机端高度更准；宽屏无影响 */
+  html, body { height: 100%; height: 100dvh; overflow: hidden; }
   body { background: var(--bg); color: var(--ink); font-family: 'Noto Serif SC', serif; display: flex; flex-direction: column; align-items: center; }
-  header { width: 100%; max-width: 600px; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0; }
+  /* 改动③：加了 position:relative; z-index:20，保证 ✕ 永远点得到 */
+  header { width: 100%; max-width: 600px; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0; position: relative; z-index: 20; }
   .back-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--ink); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); text-decoration: none; font-size: 16px; flex-shrink: 0; }
   .back-btn:hover { background: var(--soft); }
   .title-block { flex: 1; }
@@ -23,7 +25,8 @@
   .comic-viewport { width: 100%; height: 100%; overflow: hidden; border-radius: 6px; background: transparent; touch-action: pan-y; cursor: zoom-in; }
   .comic-track { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1); will-change: transform; }
   .comic-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-  .comic-slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; pointer-events: none; border-radius: 4px; }
+  /* 改动①：图片尺寸改成和漫画正常文件一致，杜绝竖图溢出撑乱布局 */
+  .comic-slide img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; border-radius: 4px; }
   .side-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 64px; border: none; border-radius: 8px; background: rgba(255,255,255,0.12); backdrop-filter: blur(4px); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--ink); transition: background 0.15s, opacity 0.15s; z-index: 10; font-weight: 300; }
   .side-btn:hover { background: rgba(255,255,255,0.25); }
   .side-btn:disabled { opacity: 0.15; cursor: not-allowed; }
@@ -32,9 +35,9 @@
   .progress-wrap { width: 100%; max-width: 600px; padding: 0.4rem 1rem 0.6rem; flex-shrink: 0; }
   .progress-bar { width: 100%; height: 2px; background: var(--soft); border-radius: 2px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
-  .lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; overflow-y: auto; -webkit-overflow-scrolling: touch; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; cursor: zoom-out; }
+  .lightbox { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(0,0,0,0.85); z-index: 9999; overflow-y: auto; -webkit-overflow-scrolling: touch; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; cursor: zoom-out; }
   .lightbox.open { opacity: 1; pointer-events: all; }
-  .lightbox-inner { width: 100%; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 1rem 0; cursor: zoom-out; }
+  .lightbox-inner { width: 100%; min-height: 100vh; min-height: 100dvh; display: flex; align-items: flex-start; justify-content: center; padding: 1rem 0; cursor: zoom-out; }
   .lightbox-inner img { width: 100%; max-width: 800px; height: auto; display: block; border-radius: 4px; cursor: zoom-out; }
   .lb-hint { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); color: white; font-size: 11px; padding: 4px 14px; border-radius: 12px; pointer-events: none; white-space: nowrap; z-index: 10000; }
 </style>
