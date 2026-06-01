@@ -17,8 +17,6 @@
   .title-block h1 { font-size: 0.9rem; font-weight: 600; }
   .title-block p { font-size: 0.65rem; color: var(--muted); }
   .page-counter { font-size: 0.75rem; color: var(--muted); }
-  .close-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--ink); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--ink); flex-shrink: 0; transition: background 0.2s; }
-  .close-btn:hover { background: var(--soft); }
   .reader { width: 100%; max-width: 480px; flex: 1; position: relative; padding: 0 0.5rem; min-height: 0; }
   .comic-viewport { width: 100%; height: 100%; overflow: hidden; border-radius: 6px; background: white; box-shadow: 0 2px 16px rgba(0,0,0,0.08); touch-action: pan-y; cursor: zoom-in; }
   .comic-track { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1); will-change: transform; }
@@ -44,7 +42,6 @@
 <header>
   <a class="back-btn" onclick="if(window.top!==window){window.top.postMessage('closeOverlay','*')}else{window.location.href='https://yvonneh10000.framer.website/yiwanwan'}">←</a>
   <div class="title-block"><h1>漫画连载</h1><p>壹碗碗 · 个人作品</p></div>
-  <button class="close-btn" onclick="if(window.top!==window){window.top.postMessage('closeOverlay','*')}else{window.location.href='https://yvonneh10000.framer.website/yiwanwan'}">✕</button>
   <span class="page-counter" id="counter">1 / 30</span>
 </header>
 
